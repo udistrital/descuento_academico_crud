@@ -43,7 +43,7 @@ steps:
     branch:
     - develop
     - feature/*
-    - release
+    - release/*
     event:
     - push
 
@@ -79,7 +79,6 @@ steps:
     branch:
     - develop
     - release/*
-    - main
     - feature/*
     - master
     event:
@@ -151,7 +150,7 @@ steps:
       - release
   when:
     branch:
-    - release
+    - release/*
     event:
     - push
 
@@ -213,7 +212,7 @@ steps:
          CLUSTER=test
          MYCONTAINER=$${AWS_CONTAINER}/${DRONE_REPO##udistrital/}:release
          ;;
-       main)
+       master)
          AMBIENTE=prod
          CLUSTER=oas
          MYCONTAINER=$${AWS_CONTAINER}/${DRONE_REPO##udistrital/}:latest
