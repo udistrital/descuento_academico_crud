@@ -188,7 +188,7 @@ steps:
     repo: ${DRONE_REPO##udistrital/}
     tags:
       - ${DRONE_COMMIT:0:7}
-      - release
+      - latest
   when:
     branch:
     - master
