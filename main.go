@@ -7,6 +7,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/udistrital/auditoria"
 	_ "github.com/udistrital/descuento_academico_crud/routers"
+	"github.com/udistrital/auditoria"
 	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
 	"github.com/udistrital/utils_oas/customerror"
 )
@@ -40,11 +41,6 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
-
-	/*logPath := "{\"filename\":\""
-	logPath += beego.AppConfig.String("logPath")
-	logPath += "\"}"
-	logs.SetLogger(logs.AdapterFile, logPath)*/
 
 	apistatus.Init()
 	auditoria.InitMiddleware()
