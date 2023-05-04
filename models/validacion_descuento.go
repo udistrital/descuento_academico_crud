@@ -139,7 +139,7 @@ func UpdateValidacionDescuentoById(m *ValidacionDescuento) (err error) {
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
-		if num, err = o.Update(m, "ReciboMatriculaId", "TipoDuracionId", "SolicitudDescuentoId", "TipoDuracionId", "ValorBase", "ValorConDescuento", "Autorizado", "Activo", "FechaModificacion"); err == nil {
+		if num, err = o.Update(m, "ReciboMatriculaId", "SolicitudDescuentoId", "TipoDuracionId", "ValorBase", "ValorConDescuento", "Autorizado", "Activo", "FechaModificacion"); err == nil {
 			fmt.Println("Number of records updated in database:", num)
 		}
 	}
