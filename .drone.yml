@@ -11,17 +11,17 @@ kind: pipeline
 name: oas_api_ci
 
 steps:
-# - name: check_readme
-#   image: jjvargass/qa_develoment:latest
-#   commands:
-#   - python /app/check_readme.py
-#   when:
-#     branch:
-#     - develop
-#     - feature/*
-#     - release
-#     event:
-#     - push
+- name: check_readme
+  image: jjvargass/qa_develoment:latest
+  commands:
+  - python /app/check_readme.py
+  when:
+    branch:
+    - develop
+    - feature/*
+    - release/*
+    event:
+    - push
 
 - name: check_branch
   image: jjvargass/qa_develoment:latest
@@ -31,7 +31,7 @@ steps:
     branch:
     - develop
     - feature/*
-    - release
+    - release/*
     event:
     - push
 
@@ -62,77 +62,40 @@ steps:
     event:
     - push
 
-- name: go_run_test
-  image: golang:1.18
-  commands:
-  - go get -t
-  - go get github.com/smartystreets/goconvey/convey
-  - GO111MODULE=off go get -u gopkg.in/alecthomas/gometalinter.v1
-  - GO111MODULE=off gometalinter.v1 --install
-  - go get github.com/axw/gocov/...
-  - go get github.com/AlekSi/gocov-xml
-  - go get -u github.com/jstemmer/go-junit-report
-  - GO111MODULE=off gometalinter.v1 ./... --checkstyle | tee report.xml
-  # - gocov test ./... | gocov-xml > coverage.xml
-  # - go test -v ./... | go-junit-report > test.xml
+# - name: go_run_test
+#   image: golang:1.14
+#   commands:
+#   - go get -t
+#   - go get github.com/smartystreets/goconvey/convey
+#   - GO111MODULE=on get -u gopkg.in/alecthomas/gometalinter.v1
+#   - GO111MODULE=on gometalinter.v1 --install
+#   - go get github.com/axw/gocov/...
+#   - go get github.com/AlekSi/gocov-xml
+#   - go get -u github.com/jstemmer/go-junit-report
+#   - GO111MODULE=off gometalinter.v1 ./... --checkstyle | tee report.xml
+#   # - gocov test ./... | gocov-xml > coverage.xml
+#   # - go test -v ./... | go-junit-report > test.xml
+#   when:
+#     branch:
+#     - develop
+#     - feature/*
+#     - release/*
+   
+#     event:
+#     - push
+
+- name: run_sonar_scanner
+  image: aosapps/drone-sonar-plugin
+  settings:
+    sonar_host:
+      from_secret: SONAR_HOST
+    sonar_token:
+      from_secret: SONAR_TOKEN
   when:
     branch:
     - develop
-    - release/*
     - feature/*
-    - master
-    event:
-    - push
-
-# - name: run_sonar_scanner
-#   image: aosapps/drone-sonar-plugin
-#   settings:
-#     sonar_host:
-#       from_secret: SONAR_HOST
-#     sonar_token:
-#       from_secret: SONAR_TOKEN
-
-- name: beego_migrate
-  image: golang:1.18
-  environment:
-    PG_MIGRATION_USER:
-      from_secret: PG_MIGRATION_USER
-    PG_MIGRATION_PASS:
-      from_secret: PG_MIGRATION_PASS
-    PG_MIGRATION_URL:
-      from_secret: PG_MIGRATION_URL
-    PG_MIGRATION_DBNAME:
-      from_secret: PG_MIGRATION_DBNAME
-  commands:
-  - go install github.com/beego/bee@v1.12.3
-  - go get
-  - bee migrate -driver=postgres -conn="postgres://$${PG_MIGRATION_USER}:$${PG_MIGRATION_PASS}@$${PG_MIGRATION_URL}:5432/$${PG_MIGRATION_DBNAME}?sslmode=disable"
-   when:
-     branch:
-     - release
-     event:
-     - push
-     
-  - name: beego_rollback
-  image: golang:1.18
-  environment:
-    PG_MIGRATION_USER:
-      from_secret: PG_MIGRATION_USER
-    PG_MIGRATION_PASS:
-      from_secret: PG_MIGRATION_PASS
-    PG_MIGRATION_URL:
-      from_secret: PG_MIGRATION_URL
-    PG_MIGRATION_DBNAME:
-      from_secret: PG_MIGRATION_DBNAME
-  commands:
-  - go install github.com/beego/bee@v1.12.3
-  - go get
-  - bee migrate rollback -driver=postgres -conn="postgres://$${PG_MIGRATION_USER}:$${PG_MIGRATION_PASS}@$${PG_MIGRATION_URL}:5432/$${PG_MIGRATION_DBNAME}?sslmode=disable"
-  when:
-    branch:
     - release/*
-    status:
-    - failure
 
 - name: publish_to_ecr_release
   image: plugins/ecr
@@ -153,7 +116,6 @@ steps:
     event:
     - push
 
-
 - name: publish_to_ecr_master
   image: plugins/ecr
   settings:
@@ -173,7 +135,6 @@ steps:
     event:
     - push
 
-
 - name: update_aws_ecs
   image: golang:1.18
   environment:
@@ -185,7 +146,7 @@ steps:
       from_secret: AWS_CONTAINER
   commands:
   - case ${DRONE_BRANCH} in
-       release)
+       release/*)
          AMBIENTE=test
          CLUSTER=test
          MYCONTAINER=$${AWS_CONTAINER}/${DRONE_REPO##udistrital/}:release
