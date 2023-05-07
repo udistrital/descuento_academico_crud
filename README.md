@@ -1,13 +1,15 @@
+
 # descuento_academica_crud
 El API provee la gestion de las diferentes descuentos que puede tener un tercero en el Sistema de Gestión Académica
 
-## Especificaciones Técnicas
 
-### Tecnologías Implementadas y Versiones
-* [Golang](https://github.com/udistrital/introduccion_oas/blob/master/instalacion_de_herramientas/golang.md)
-* [BeeGo](https://github.com/udistrital/introduccion_oas/blob/master/instalacion_de_herramientas/beego.md)
-* [Docker](https://docs.docker.com/engine/install/ubuntu/)
-* [Docker Compose](https://docs.docker.com/compose/)
+Integración con
+
+ - `CI`
+ - `AWS Lambda - S3`
+ - `Drone 1.x`
+ - `descuento_academico_crud master/develop`
+
 
 ### Variables de Entorno
 ```shell
@@ -20,18 +22,25 @@ DESCUENTO_ACADEMICO_CRUD_SCHEMA=[esquema donde se ubican las tablas]
 DESCUENTO_ACADEMICO_CRUD_HTTP_PORT=[puerto de ejecucion] bee run
 ```
 
-**NOTA:** Las variables se pueden ver en el fichero conf/app.conf y están identificadas con DESCUENTO_ACADEMICO_CRUD_...
+## Requerimientos
+Go version >= 1.8.
 
-### Ejecución del Proyecto
-```shell
-#1. Obtener el repositorio con Go
-go get github.com/udistrital/descuento_academica_crud
 
-#2. Moverse a la carpeta del repositorio
-cd $GOPATH/src/github.com/udistrital/descuento_academica_crud
+## Preparación
+Para usar el API, usar el comando:
 
-# 3. Moverse a la rama **develop**
-git pull origin develop && git checkout develop
+ - `go get github.com/udistrital/descuento_academico_crud`
+
+## Ejecución
+Definir los valores de las siguientes variables de entorno:
+
+ - `DESCUENTO_ACADEMICO_CRUD_HTTP_PORT`: Puerto asignado para la ejecución del API
+ - `DESCUENTO_ACADEMICO_CRUD__PGUSER`: Usuario de la base de datos
+ - `DESCUENTO_ACADEMICO_CRUD__PGPASS`: Clave del usuario para la conexión a la base de datos  
+ - `DESCUENTO_ACADEMICO_CRUD__PGURLS`: Host de conexión
+ - `DESCUENTO_ACADEMICO_CRUD__PGDB`: Nombre de la base de datos
+ - `DESCUENTO_ACADEMICO__SCHEMA`: Esquema a utilizar en la base de datos
+
 
 # 4. alimentar todas las variables de entorno que utiliza el proyecto.
 DESCUENTO_ACADEMICO_CRUD_HTTP_PORT=8080 DESCUENTO_ACADEMICO_CRUD_PGHOST=127.0.0.1:27017 DESCUENTO_ACADEMICO_CRUD_SOME_VARIABLE=some_value bee run
@@ -91,3 +100,4 @@ descuento_academica_crud is free software: you can redistribute it and/or modify
 descuento_academica_crud is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with novedades_crud. If not, see https://www.gnu.org/licenses/.
+

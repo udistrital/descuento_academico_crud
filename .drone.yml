@@ -5,23 +5,23 @@ workspace:
       branch:
       - develop
       - release/*
-      - main
+      - master
 
 kind: pipeline
 name: oas_api_ci
 
 steps:
-- name: check_readme
-  image: jjvargass/qa_develoment:latest
-  commands:
-  - python /app/check_readme.py
-  when:
-    branch:
-    - develop
-    - feature/*
-    - release/*
-    event:
-    - push
+# - name: check_readme
+#   image: jjvargass/qa_develoment:latest
+#   commands:
+#   - python /app/check_readme.py
+#   when:
+#     branch:
+#     - develop
+#     - feature/*
+#     - release
+#     event:
+#     - push
 
 - name: check_branch
   image: jjvargass/qa_develoment:latest
@@ -31,7 +31,7 @@ steps:
     branch:
     - develop
     - feature/*
-    - release/*
+    - release
     event:
     - push
 
@@ -57,7 +57,8 @@ steps:
     branch:
     - develop
     - release/*
-    - main
+    - feature/*
+    - master
     event:
     - push
 
@@ -78,17 +79,18 @@ steps:
     branch:
     - develop
     - release/*
-    - main
+    - feature/*
+    - master
     event:
     - push
 
-- name: run_sonar_scanner
-  image: aosapps/drone-sonar-plugin
-  settings:
-    sonar_host:
-      from_secret: SONAR_HOST
-    sonar_token:
-      from_secret: SONAR_TOKEN
+# - name: run_sonar_scanner
+#   image: aosapps/drone-sonar-plugin
+#   settings:
+#     sonar_host:
+#       from_secret: SONAR_HOST
+#     sonar_token:
+#       from_secret: SONAR_TOKEN
 
 - name: beego_migrate
   image: golang:1.18
@@ -105,13 +107,13 @@ steps:
   - go install github.com/beego/bee@v1.12.3
   - go get
   - bee migrate -driver=postgres -conn="postgres://$${PG_MIGRATION_USER}:$${PG_MIGRATION_PASS}@$${PG_MIGRATION_URL}:5432/$${PG_MIGRATION_DBNAME}?sslmode=disable"
-  when:
-    branch:
-    - release/*
-    event:
-    - push
-
-- name: beego_rollback
+   when:
+     branch:
+     - release
+     event:
+     - push
+     
+  - name: beego_rollback
   image: golang:1.18
   environment:
     PG_MIGRATION_USER:
@@ -151,7 +153,8 @@ steps:
     event:
     - push
 
-- name: publish_to_ecr_main
+
+- name: publish_to_ecr_master
   image: plugins/ecr
   settings:
     access_key:
@@ -166,9 +169,10 @@ steps:
       - latest
   when:
     branch:
-    - main
+    - master
     event:
     - push
+
 
 - name: update_aws_ecs
   image: golang:1.18
@@ -181,12 +185,12 @@ steps:
       from_secret: AWS_CONTAINER
   commands:
   - case ${DRONE_BRANCH} in
-       release/*)
+       release)
          AMBIENTE=test
          CLUSTER=test
          MYCONTAINER=$${AWS_CONTAINER}/${DRONE_REPO##udistrital/}:release
          ;;
-       main)
+       master)
          AMBIENTE=prod
          CLUSTER=oas
          MYCONTAINER=$${AWS_CONTAINER}/${DRONE_REPO##udistrital/}:latest
@@ -204,7 +208,7 @@ steps:
   when:
     branch:
     - release/*
-    - main
+    - master
     event:
     - push
 
@@ -236,7 +240,7 @@ steps:
     branch:
     - develop
     - release/*
-    - main
+    - master
     event:
     - push
     status:
