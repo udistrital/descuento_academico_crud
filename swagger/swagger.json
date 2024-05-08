@@ -1603,7 +1603,6 @@
                     "type": "number",
                     "format": "double"
                 },
-
                 "TipoDescuentoId": {
                     "$ref": "#/definitions/models.TipoDescuento"
                 }
